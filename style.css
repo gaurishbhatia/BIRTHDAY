@@ -1,0 +1,171 @@
+/* style.css */
+
+:root {
+    --primary-red: #ff385c;
+    --secondary-pink: #ffafcc;
+    --background-color: #ffe8ee;
+    --text-color: #333;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow: hidden; /* Hide scrollbar due to floating hearts */
+}
+
+/* --- Floating Hearts Background --- */
+.heart {
+    position: absolute;
+    color: var(--primary-red);
+    font-size: 20px;
+    animation: float 10s linear infinite;
+    opacity: 0.7;
+    pointer-events: none; /* Allows clicks on elements underneath */
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
+
+/* --- Main Content Styling --- */
+#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 10; /* Ensure content is above hearts */
+}
+
+h1 {
+    color: var(--primary-red);
+    font-size: 2.5em;
+}
+
+/* Specific styling for sections (initially hidden) */
+.section {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    max-width: 90%;
+    width: 500px;
+    display: none; /* Initially hidden by JS */
+}
+
+button {
+    background-color: var(--secondary-pink);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--primary-red);
+}
+
+/* --- Tic-Tac-Toe Styling --- */
+#tictactoe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.cell {
+    background-color: var(--secondary-pink);
+    border: 2px solid var(--primary-red);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+    color: var(--primary-red); /* Color for Heart and Cross symbols */
+}
+
+.cell:hover:empty {
+    background-color: #ffc9e0; /* Lighter pink on hover */
+}
+
+/* --- Love Letter Styling --- */
+#love-letter-section {
+    display: none; /* Hidden until game is won */
+    position: relative;
+    width: 350px;
+    height: 250px;
+    background: transparent;
+    cursor: pointer;
+    margin-top: 50px;
+}
+
+.envelope {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--secondary-pink);
+    border-radius: 10px;
+    transition: transform 1s ease-in-out;
+}
+
+.envelope.open {
+    transform: rotateY(180deg);
+}
+
+.letter-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    border: 1px solid #aaa;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Georgia', serif; /* A nice script/serif font */
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Ruled paper effect */
+.letter-content.ruled {
+    background: white;
+    /* Horizontal lines */
+    background-image: repeating-linear-gradient(
+        to bottom,
+        #ddd 0px, /* Light grey line */
+        #ddd 1px,
+        transparent 1px,
+        transparent 25px /* Line spacing */
+    );
+    background-size: 100% 26px; /* Adjust size based on line spacing */
+    /* Vertical line (margin) */
+    border-left: 3px solid var(--primary-red);
+    padding-left: 30px; /* Space for margin line */
+}
+
+/* Ensure the text starts at the first rule */
+.letter-content p {
+    margin: 0;
+    padding: 0;
+    line-height: 25px; /* Matches the line spacing */
+    text-align: left;
+    min-height: 25px; /* Ensures blank lines are spaced correctly */
+}
