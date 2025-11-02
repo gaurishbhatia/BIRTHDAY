@@ -4,58 +4,632 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday, My Love! ❤️</title>
-    
+    <!-- Google Fonts: Pacifico (Playful/Romantic) and Caveat (Handwritten Letter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Pacifico&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome (for the heart/cross symbols) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS VARIABLES & GLOBALS --- */
+        :root {
+            --primary-red: #ff385c;
+            --secondary-pink: #ffafcc;
+            --background-color: #ffe8ee;
+            --text-color: #333;
+            --animation-speed: 0.5s;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden; 
+            min-height: 100vh;
+        }
+
+        /* --- CONTENT & Z-INDEX FIX --- */
+        #content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 100; /* Ensure content is on top of hearts */
+        }
+
+        /* --- SECTION STYLING & ANIMATIONS --- */
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            max-width: 90%;
+            width: 550px;
+            display: none;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity var(--animation-speed) ease-in-out, 
+                        transform var(--animation-speed) ease-in-out;
+        }
+
+        .section.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        h1, h2 {
+            font-family: 'Pacifico', cursive; /* Use Pacifico for titles */
+            color: var(--primary-red);
+            text-shadow: 2px 2px 4px rgba(255, 56, 92, 0.2);
+        }
+
+        #animated-text {
+            min-height: 100px;
+            display: block;
+            font-size: clamp(1.5em, 5vw, 2.8em); /* Responsive font size */
+            font-weight: 700;
+        }
+        
+        /* --- BUTTON STYLING --- */
+        button {
+            background-color: var(--secondary-pink);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: var(--primary-red);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- FLOATING HEART ANIMATION (FULL SCREEN) --- */
+        .heart {
+            position: absolute;
+            color: var(--primary-red);
+            animation: float 15s linear infinite, wobble 5s ease-in-out infinite alternate;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1; /* Keep below content */
+        }
+        
+        @keyframes float {
+            0% { transform: translate3d(0, 100vh, 0) rotate(0deg) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translate3d(0, -10vh, 0) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+        @keyframes wobble {
+            from { transform: translateX(-10px) rotate(5deg); }
+            to { transform: translateX(10px) rotate(-5deg); }
+        }
+
+        /* --- TIC-TAC-TOE STYLING (3D & ANIMATED) --- */
+        #game-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #tictactoe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 10px;
+            margin-top: 20px;
+            perspective: 1000px; 
+            transform: rotateX(15deg) rotateY(0deg); /* 3D tilt for the board */
+            transition: all 1s ease-in-out;
+        }
+        
+        /* Responsive Grid for Mobile */
+        @media (max-width: 600px) {
+            #tictactoe-grid {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+                gap: 5px;
+            }
+        }
+
+        .cell {
+            background-color: var(--secondary-pink);
+            border: 3px solid var(--primary-red);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4.5em;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+            color: var(--primary-red);
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cell:hover:not(:empty) {
+            transform: translateZ(10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Symbols */
+        .cell i {
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Heart Fly Animation (on click of pre-filled hearts) */
+        .cell.flying {
+            animation: flyUp 0.5s ease-out;
+            opacity: 0.5;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 0.8; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Winning animation (pulsing heart) */
+        .winning-heart {
+            position: fixed; /* Fixed position over the screen */
+            font-size: 5em;
+            color: var(--primary-red);
+            opacity: 0;
+            animation: heartPulse 2s ease-out infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes heartPulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(2.5); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        }
+
+        /* --- ENVELOPE STYLING (FIXED AND CENTERED) --- */
+        #love-letter-container {
+            position: relative;
+            width: 380px;
+            height: 280px;
+            margin: 50px auto 0; 
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #love-letter-section {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+        }
+
+        /* Base Envelope Body */
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-red);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            z-index: 20;
+            transform-style: preserve-3d;
+            transition: all 1s;
+        }
+
+        /* Flaps using pseudo-elements */
+        .envelope::before, .envelope::after {
+            content: '';
+            position: absolute;
+            display: block;
+            border-style: solid;
+        }
+        
+        /* Bottom V-flap (decorative) */
+        .envelope::before {
+            border-width: 0 190px 140px;
+            border-color: transparent transparent #cc2c4b; /* Darker red */
+            bottom: 0;
+            left: 0;
+            border-radius: 0 0 15px 15px;
+        }
+
+        /* Top Closing Flap */
+        .envelope::after {
+            border-width: 140px 190px 0;
+            border-color: var(--secondary-pink) transparent transparent;
+            top: 0;
+            left: 0;
+            z-index: 25;
+            transform-origin: top;
+            transition: transform 1s ease-in-out, opacity 0.5s;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        /* Open Animation */
+        .envelope.open::after {
+            transform: rotateX(180deg) translateY(-20px);
+            opacity: 0; /* Hide flap once flipped */
+        }
+        
+        /* The letter itself */
+        .letter-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(-10px); 
+            width: 95%;
+            height: 95%;
+            z-index: 15;
+            background-color: white;
+            padding: 25px;
+            box-sizing: border-box;
+            font-family: 'Caveat', cursive; 
+            font-size: clamp(1em, 2vw, 1.2em);
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            transition: opacity 1s;
+        }
+
+        /* Ruled paper effect */
+        .letter-content.ruled {
+            background-image: repeating-linear-gradient(
+                to bottom,
+                #f0f0f0 0px, 
+                #f0f0f0 1px,
+                transparent 1px,
+                transparent 30px
+            );
+            background-size: 100% 31px;
+            border-left: 5px solid var(--primary-red);
+            padding-left: 35px;
+        }
+        .letter-content p {
+            margin: 0;
+            padding: 0;
+            line-height: 30px;
+            text-align: left;
+            min-height: 30px;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- This is where hearts will be generated by JavaScript -->
+
     <div id="content">
+        <!-- 1. Animated Message Section -->
         <div id="intro-message" class="section active">
             <h1 id="animated-text"></h1>
         </div>
 
+        <!-- 2. Question Section -->
         <div id="question-section" class="section">
             <h2>Ready for the Birthday Fun?</h2>
-            <button id="yes-btn">YES! I can't wait! 🎉</button>
+            <button id="yes-btn">YES! I'm excited! 🎉</button>
             <button id="no-btn">No, maybe later... 😴</button>
         </div>
 
+        <!-- 3. Tic-Tac-Toe Game Section -->
         <div id="game-section" class="section">
             <h2>**Win to prove that you love me!**</h2>
-            <p style="color: #666;">(HINT: The heart always finds its center!)</p>
+            <p style="color: #666; font-weight: 600;">(HINT: The heart always finds its center!)</p>
             <div id="tictactoe-grid">
-                </div>
+                <!-- Cells generated by JavaScript will contain pre-filled hearts and crosses -->
+            </div>
             <p id="game-message" style="margin-top: 25px; font-weight: bold;"></p>
         </div>
 
-        <div id="love-letter-container">
-            <h2 id="letter-prompt" style="display: none;">Tap the magical envelope to open your letter!</h2>
-            <div id="love-letter-section" style="display: none;">
+        <!-- 4. Love Letter Section (Container for centering) -->
+        <div id="love-letter-container" class="section">
+            <h2 id="letter-prompt" style="display: none; font-size: 1.8em;">Tap the magical envelope to open your letter!</h2>
+            <div id="love-letter-section">
                 <div class="envelope"></div>
-                <div class="letter-content ruled" id="the-letter">
-                    <p>My Beloved [Girlfriend's Name],</p>
+                <div class="letter-content ruled" id="the-letter" style="opacity: 0;">
+                    <!-- 💖💖💖 EDIT YOUR LETTER HERE 💖💖💖 -->
+                    <p>My Precious [Girlfriend's Name],</p>
                     <p></p>
-                    <p>Happy Birthday! You are my greatest adventure and my calm harbor.</p>
+                    <p>Happy Birthday! I hope this surprise brightened your day even a little bit. You deserve the world.</p>
                     <p></p>
-                    <p>I hope you enjoyed the little game—of course you won! That heart belongs right in the center, and my heart belongs entirely to you.</p>
+                    <p>Of course you won the game! The heart always knows where it belongs—right in the center. And my heart is yours, today and every day.</p>
                     <p></p>
-                    <p>I am so thankful for your smile, your kindness, and the beautiful way you look at the world. You make every day brighter.</p>
+                    <p>Thank you for filling my life with so much joy, laughter, and unbelievable love. You are my best friend, my greatest adventure, and my beautiful future.</p>
                     <p></p>
-                    <p>I love you fiercely, truly, and forever.</p>
+                    <p>Here's to celebrating you!</p>
                     <p></p>
-                    <p>Yours always,</p>
+                    <p>I love you more than words can say.</p>
+                    <p></p>
+                    <p>Yours always and forever,</p>
                     <p>Your [Your Nickname]</p>
-                    </div>
+                    <!-- 💖💖💖 END OF EDIT AREA 💖💖💖 -->
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+<script>
+    // --- 1. Setup and Initialization ---
+
+    const contentDiv = document.getElementById('content');
+    const introMessage = document.getElementById('intro-message');
+    const questionSection = document.getElementById('question-section');
+    const gameSection = document.getElementById('game-section');
+    const letterContainer = document.getElementById('love-letter-container');
+    const letterPrompt = document.getElementById('letter-prompt');
+    const loveLetterSection = document.getElementById('love-letter-section');
+    const envelope = document.querySelector('.envelope');
+    const letterContent = document.getElementById('the-letter');
+    const tttGrid = document.getElementById('tictactoe-grid');
+    const gameMessage = document.getElementById('game-message');
+
+    // Pre-filled state: Only center (4) is empty. Diagonal is user heart.
+    let gameState = [
+        'heart', 'cross', 'cross',
+        'cross', '', 'cross',
+        'cross', 'cross', 'heart'
+    ];
+    const userSymbol = '<i class="fas fa-heart"></i>'; // Heart
+    const computerSymbol = '<i class="fas fa-times"></i>'; // Cross
+    const winIndex = 4; // Center cell is the winning move.
+
+    let isGameActive = true;
+
+    // --- 2. Floating Hearts Animation ---
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        
+        const symbol = Math.random() < 0.9 ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-star"></i>';
+        heart.innerHTML = symbol; 
+        
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = Math.random() * 8 + 10 + 's'; 
+        heart.style.animationDelay = Math.random() * -10 + 's'; 
+        heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
+        
+        contentDiv.appendChild(heart);
+
+        setTimeout(() => {
+            heart.remove();
+        }, 18000); 
+    }
+    setInterval(createHeart, 150); 
+
+    // --- Helper for smooth section transitions ---
+    function switchSection(hideElement, showElement, callback = () => {}) {
+        if (hideElement) {
+            hideElement.classList.remove('active');
+            
+            setTimeout(() => {
+                hideElement.style.display = 'none';
+            }, 500);
+        }
+        
+        showElement.style.display = 'flex'; 
+        setTimeout(() => {
+            showElement.classList.add('active');
+            callback();
+        }, hideElement ? 500 : 50); 
+    }
+
+
+    // --- 3. Animated Text Sequence (Faster Start) ---
+
+    const messages = [
+        "Happy Birthday, My Love!",
+        "You are my whole heart...",
+        "Get ready for a little surprise!"
+    ];
+    let messageIndex = 0;
+    let charIndex = 0;
+    const speed = 60; // Typing speed in ms
+
+    function typeWriter() {
+        if (messageIndex < messages.length) {
+            const currentMessage = messages[messageIndex];
+            if (charIndex < currentMessage.length) {
+                document.getElementById('animated-text').innerHTML += currentMessage.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, speed);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('animated-text').innerHTML = '';
+                    charIndex = 0;
+                    messageIndex++;
+                    if (messageIndex < messages.length) {
+                        typeWriter();
+                    } else {
+                        // Sequence complete, show question
+                        setTimeout(() => switchSection(introMessage, questionSection), 500); 
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    window.onload = () => {
+        typeWriter();
+    };
+
+
+    // --- 4. Question Logic ---
+
+    document.getElementById('yes-btn').addEventListener('click', () => {
+        switchSection(questionSection, gameSection, showGame);
+    });
+
+    document.getElementById('no-btn').addEventListener('click', () => {
+        gameMessage.textContent = "Hahaha! Too bad, I'm going to show it to you anyway! 😉";
+        setTimeout(() => {
+             switchSection(questionSection, gameSection, showGame);
+        }, 1000);
+    });
+
+
+    // --- 5. Tic-Tac-Toe Game Logic (Guaranteed Win via Center) ---
+
+    function createGameGrid() {
+        tttGrid.innerHTML = '';
+        
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.setAttribute('data-index', i);
+            cell.addEventListener('click', handleCellClick);
+            
+            if (gameState[i] === 'heart') {
+                cell.innerHTML = userSymbol;
+            } else if (gameState[i] === 'cross') {
+                cell.innerHTML = computerSymbol;
+            }
+            
+            tttGrid.appendChild(cell);
+        }
+        isGameActive = true;
+    }
+
+    function handleCellClick(event) {
+        if (!isGameActive) return;
+
+        const clickedCell = event.target;
+        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+        if (clickedCellIndex === winIndex) {
+            // --- WINNING MOVE (CENTER) ---
+            if (gameState[winIndex] === '') {
+                gameState[winIndex] = 'heart';
+                placeSymbol(clickedCell, userSymbol);
+                endGame('You Win! I knew you loved me! ❤️', true);
+            }
+        } else if (gameState[clickedCellIndex] === 'heart') {
+            // --- PRE-FILLED HEART CLICK (ANIMATION ONLY) ---
+            clickedCell.classList.add('flying');
+            gameMessage.textContent = 'Those hearts are already safe! Find the missing one.';
+            
+            setTimeout(() => {
+                clickedCell.classList.remove('flying');
+                gameMessage.textContent = 'Win to prove that you love me!';
+            }, 600);
+            
+        } else {
+            // --- WRONG MOVE (BLOCK AND HINT) ---
+            gameMessage.innerHTML = 'Nope! That spot is not the key to my heart... Try again! 😜';
+            
+            clickedCell.style.transform = 'scale(0.9) rotateZ(5deg)';
+            
+            setTimeout(() => {
+                clickedCell.style.transform = 'scale(1) rotateZ(0deg)';
+                gameMessage.textContent = 'Win to prove that you love me!';
+            }, 500);
+        }
+    }
+
+    function placeSymbol(cell, symbol) {
+        cell.innerHTML = symbol;
+    }
+
+    function endGame(message, didWin) {
+        isGameActive = false;
+        gameMessage.textContent = message;
+        
+        tttGrid.querySelectorAll('.cell').forEach(cell => {
+            cell.removeEventListener('click', handleCellClick);
+            cell.style.cursor = 'default';
+        });
+
+        if (didWin) {
+            // --- Winning Animation ---
+            const allCells = tttGrid.querySelectorAll('.cell');
+            
+            setTimeout(() => {
+                // Clear all crosses and cells except the winning hearts
+                allCells.forEach((cell, index) => {
+                    if (index !== 0 && index !== 4 && index !== 8) {
+                        cell.style.transition = 'opacity 0.5s, transform 0.5s';
+                        cell.style.opacity = '0';
+                        cell.style.transform = 'translateY(100px)';
+                    }
+                });
+
+                // Clear board structure
+                tttGrid.style.opacity = '0';
+                tttGrid.style.transform = 'translateY(-50px) rotateX(15deg)';
+                gameMessage.innerHTML = '<span style="color: var(--primary-red); font-size: 2em;">You have my heart forever! ❤️</span>';
+                
+                // Start pulsing animation on the three winning hearts (0, 4, 8)
+                [0, 4, 8].forEach(index => {
+                    const heartPulse = document.createElement('div');
+                    heartPulse.classList.add('winning-heart');
+                    heartPulse.innerHTML = userSymbol;
+                    
+                    // Center the heart pulse in the screen
+                    heartPulse.style.top = '50%';
+                    heartPulse.style.left = '50%';
+                    
+                    document.body.appendChild(heartPulse);
+                });
+
+                // Proceed to the letter after a short delay
+                setTimeout(showLoveLetter, 4000);
+            }, 1000);
+        }
+    }
+
+    function showGame() {
+        createGameGrid();
+        gameMessage.textContent = 'You are the Heart. Click to make your first move!';
+        letterPrompt.style.display = 'none';
+    }
+
+
+    // --- 6. Love Letter Logic ---
+
+    function showLoveLetter() {
+        document.querySelectorAll('.winning-heart').forEach(el => el.remove());
+        
+        switchSection(gameSection, letterContainer);
+        letterPrompt.style.display = 'block';
+        loveLetterSection.style.display = 'flex';
+        
+        envelope.classList.remove('open');
+        letterContent.style.opacity = '0';
+    }
+
+    loveLetterSection.addEventListener('click', () => {
+        if (envelope.classList.contains('open')) return;
+        
+        envelope.classList.add('open');
+        letterPrompt.textContent = "Enjoy reading! I love you! 🥰";
+        
+        setTimeout(() => {
+            letterContent.style.display = 'block';
+            setTimeout(() => {
+                 letterContent.style.opacity = '1';
+            }, 100);
+        }, 800); 
+    });
+</script>
 </body>
 </html>
