@@ -13,9 +13,9 @@
 
         body {
             font-family: 'Georgia', serif;
-            overflow-x: hidden;
+            overflow: hidden;
             background: linear-gradient(135deg, #ff6b9d 0%, #ffc3e1 50%, #ff6b9d 100%);
-            min-height: 100vh;
+            height: 100vh;
         }
 
         /* Floating hearts and stars background */
@@ -55,8 +55,11 @@
 
         /* Screen container */
         .screen {
-            position: relative;
-            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -65,16 +68,19 @@
             transform: scale(0.8);
             transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 1;
+            pointer-events: none;
         }
 
         .screen.active {
             opacity: 1;
             transform: scale(1);
+            pointer-events: auto;
         }
 
         .screen.exit {
             opacity: 0;
             transform: scale(0.8);
+            pointer-events: none;
         }
 
         /* Welcome messages */
@@ -225,8 +231,22 @@
         }
 
         .cross-icon {
-            color: #666;
+            color: #333;
+            font-weight: bold;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            position: relative;
+            display: inline-block;
+        }
+
+        .cross-icon::before {
+            content: '✕';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #666, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .cell.fly-animation .heart-icon {
@@ -256,6 +276,25 @@
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(2); opacity: 0.8; }
             100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes riseAndExplode {
+            0% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+            40% { 
+                transform: translateY(-100px) scale(1.5); 
+                opacity: 1; 
+            }
+            70% { 
+                transform: translateY(-150px) scale(2.5); 
+                opacity: 0.9; 
+            }
+            100% { 
+                transform: translateY(-200px) scale(4); 
+                opacity: 0; 
+            }
         }
 
         .win-message {
@@ -343,8 +382,9 @@
         }
 
         .envelope.open .letter {
-            transform: translateY(-120%);
+            transform: translateY(-180%);
             opacity: 1;
+            z-index: 10;
         }
 
         .letter-content {
@@ -498,8 +538,13 @@
 
         // Question handlers
         function handleYes() {
-            setTimeout(() => showScreen(3), 500);
-            initGame();
+            const msg = document.getElementById('playfulMsg');
+            msg.textContent = 'Good choice! 😊💕';
+            msg.style.display = 'block';
+            setTimeout(() => {
+                showScreen(3);
+                initGame();
+            }, 1500);
         }
 
         function handleNo() {
@@ -513,9 +558,9 @@
 
         // Tic Tac Toe Game
         const board = [
-            ['X', '❤️', 'X'],
-            ['❤️', '', 'X'],
-            ['X', '❤️', 'X']
+            ['❤️', 'X', 'X'],
+            ['X', '', '❤️'],
+            ['X', 'X', '❤️']
         ];
 
         function initGame() {
@@ -567,40 +612,51 @@
             const boardEl = document.getElementById('board');
             const cells = boardEl.querySelectorAll('.cell');
             
-            // Create expanding pulse hearts
-            const positions = [
-                { top: '75px', left: '75px' },
-                { top: '225px', left: '225px' },
-                { top: '375px', left: '375px' }
-            ];
-            
-            positions.forEach((pos, index) => {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'winning-heart';
-                    heart.textContent = '❤️';
-                    heart.style.top = pos.top;
-                    heart.style.left = pos.left;
-                    boardEl.appendChild(heart);
-                    
-                    setTimeout(() => heart.remove(), 1000);
-                }, index * 200);
-            });
-            
+            // Hide all cells first
             setTimeout(() => {
                 cells.forEach(cell => {
                     cell.style.opacity = '0';
                     cell.style.transform = 'scale(0)';
                 });
-            }, 600);
+            }, 300);
             
+            // Show only winning hearts after cells disappear
             setTimeout(() => {
-                document.getElementById('winMessage').style.display = 'block';
-            }, 1200);
-            
-            setTimeout(() => {
-                showScreen(4);
-            }, 3500);
+                boardEl.innerHTML = '';
+                
+                // Create three winning hearts that will rise and expand
+                const positions = [
+                    { top: '75px', left: '75px' },
+                    { top: '240px', left: '240px' },
+                    { top: '405px', left: '405px' }
+                ];
+                
+                positions.forEach((pos, index) => {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'rising-heart';
+                        heart.textContent = '❤️';
+                        heart.style.position = 'absolute';
+                        heart.style.fontSize = '4em';
+                        heart.style.top = pos.top;
+                        heart.style.left = pos.left;
+                        heart.style.color = '#ff1744';
+                        heart.style.filter = 'drop-shadow(0 0 20px rgba(255, 23, 68, 0.8))';
+                        heart.style.animation = 'riseAndExplode 2s ease-out forwards';
+                        boardEl.appendChild(heart);
+                    }, index * 300);
+                });
+                
+                // Show win message
+                setTimeout(() => {
+                    document.getElementById('winMessage').style.display = 'block';
+                }, 1000);
+                
+                // Transition to letter
+                setTimeout(() => {
+                    showScreen(4);
+                }, 3500);
+            }, 800);
         }
 
         // Envelope
