@@ -1,4 +1,4 @@
-/* script.js */
+/* script.js (UPDATED) */
 
 // --- 1. Setup and Initialization ---
 
@@ -17,26 +17,47 @@ const gameMessage = document.getElementById('game-message');
 let gameState = ['','','','','','','','',''];
 const userSymbol = '<i class="fas fa-heart"></i>'; // Heart
 const computerSymbol = '<i class="fas fa-times"></i>'; // Cross
-const winningCombo = [0, 4, 8]; // Winning combo is always top-left, center, bottom-right for a guaranteed win
+// The user needs to play the center (index 4) to win.
 
-// --- 2. Floating Hearts Animation ---
+// --- 2. Floating Hearts Animation (Slightly adjusted timing for smoother visual) ---
 function createHeart() {
     const heart = document.createElement('div');
     heart.classList.add('heart');
-    heart.innerHTML = '<i class="fas fa-heart"></i>';
+    // Randomize symbol size and type slightly for more visual interest
+    heart.innerHTML = Math.random() < 0.8 ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-star"></i>'; 
     heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.animationDuration = Math.random() * 5 + 5 + 's'; // 5-10s
-    heart.style.fontSize = Math.random() * 20 + 10 + 'px'; // 10-30px
+    heart.style.animationDuration = Math.random() * 8 + 10 + 's'; // 10-18s
+    heart.style.animationDelay = Math.random() * -10 + 's'; // Start some off-screen
+    heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
     contentDiv.appendChild(heart);
 
-    // Remove heart after it floats away to prevent memory buildup
     setTimeout(() => {
         heart.remove();
-    }, 10000); 
+    }, 18000); 
 }
+setInterval(createHeart, 200); 
 
-// Generate hearts continuously
-setInterval(createHeart, 300); 
+// --- Helper for smooth section transitions ---
+function switchSection(hideElement, showElement) {
+    // 1. Start fade-out and scale down
+    if (hideElement) {
+        hideElement.classList.remove('active');
+    }
+    
+    // 2. Wait for transition to finish, then set display:none
+    setTimeout(() => {
+        if (hideElement) {
+             hideElement.style.display = 'none';
+        }
+        
+        // 3. Set new element display:block, and then start fade-in/scale up
+        showElement.style.display = 'block';
+        setTimeout(() => {
+            showElement.classList.add('active');
+        }, 50); // Small delay to trigger CSS transition
+        
+    }, 500); // Matches the CSS transition time
+}
 
 
 // --- 3. Animated Text Sequence ---
@@ -49,7 +70,7 @@ const messages = [
 ];
 let messageIndex = 0;
 let charIndex = 0;
-const speed = 70; // Typing speed in ms
+const speed = 70; 
 
 function typeWriter() {
     if (messageIndex < messages.length) {
@@ -59,7 +80,6 @@ function typeWriter() {
             charIndex++;
             setTimeout(typeWriter, speed);
         } else {
-            // Wait a moment and then clear for the next message
             setTimeout(() => {
                 document.getElementById('animated-text').innerHTML = '';
                 charIndex = 0;
@@ -67,20 +87,13 @@ function typeWriter() {
                 if (messageIndex < messages.length) {
                     typeWriter();
                 } else {
-                    // Sequence complete, show question
-                    setTimeout(showQuestion, 500); 
+                    setTimeout(() => switchSection(introMessage, questionSection), 500); 
                 }
-            }, 1000); // Pause before next message
+            }, 1200); // Pause before next message
         }
     }
 }
 
-function showQuestion() {
-    introMessage.style.display = 'none';
-    questionSection.style.display = 'block';
-}
-
-// Start the sequence when the page loads
 window.onload = () => {
     typeWriter();
 };
@@ -89,20 +102,23 @@ window.onload = () => {
 // --- 4. Question Logic ---
 
 document.getElementById('yes-btn').addEventListener('click', () => {
-    questionSection.style.display = 'none';
+    switchSection(questionSection, gameSection);
     showGame();
 });
 
 document.getElementById('no-btn').addEventListener('click', () => {
-    alert("Hahaha! Too bad, I'm going to show it to you anyway! 😉");
-    questionSection.style.display = 'none';
-    showGame();
+    gameMessage.textContent = "Hahaha! Too bad, I'm going to show it to you anyway! 😉";
+    setTimeout(() => {
+         switchSection(questionSection, gameSection);
+         showGame();
+    }, 1500);
 });
 
 
-// --- 5. Tic-Tac-Toe Game Logic (Guaranteed Win) ---
+// --- 5. Tic-Tac-Toe Game Logic (Guaranteed Win via Center) ---
 
 function createGameGrid() {
+    tttGrid.innerHTML = ''; // Clear existing
     for (let i = 0; i < 9; i++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
@@ -116,60 +132,40 @@ function handleCellClick(event) {
     const clickedCell = event.target;
     const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
 
-    // Check if the cell is already filled
-    if (gameState[clickedCellIndex] !== '' || gameMessage.textContent.includes('You Win')) {
+    if (gameState[clickedCellIndex] !== '' || gameMessage.textContent.includes('Win')) {
         return;
     }
-
-    // --- User's Turn (ALWAYS first chance) ---
-    placeSymbol(clickedCell, clickedCellIndex, userSymbol);
-
-    // Check for win after user's move
-    if (checkWin()) {
-        endGame('You Win! I knew you loved me! ❤️');
-        return;
-    }
-
-    // --- Computer's Turn (Guaranteed Loss Strategy) ---
-    // The computer must play to ensure the user can complete the winning combo [0, 4, 8]
-    // The user MUST always play first.
-    // Since the game is designed to be won by the user, we will simplify:
     
-    // **Simplified Win-to-Proceed Logic (The "Center Tap" Mechanic):**
-    // If the game requires complex JS to ensure loss, it's safer for a no-backend free site to simplify:
-    
-    // 1. User must tap the CENTER cell (index 4) to win immediately (if it's the required "missing piece").
-    // 2. We skip computer moves entirely and check if the user completed the winning pattern [0, 4, 8].
-
-    const allCells = tttGrid.querySelectorAll('.cell');
-    
-    // Check if the user has completed the winning combination:
-    // If user has 0 and 8, and plays 4 (center) -> WIN
-    // If user has 4 and 8, and plays 0 (top-left) -> WIN
-    // If user has 0 and 4, and plays 8 (bottom-right) -> WIN
-    
-    // To simplify and ensure an immediate Win-to-Proceed for the user:
-    // **The user only needs to click the center cell (index 4) to win.**
+    // **The Guaranteed Win Logic: Must click the Center (index 4)**
     if (clickedCellIndex === 4) {
-        // Place the other two required hearts automatically for a visually complete win, 
-        // as if the user played them first in the prior non-visible games.
-        if (gameState[0] === '' && gameState[8] === '') {
-             gameState[0] = userSymbol;
-             allCells[0].innerHTML = userSymbol;
-             gameState[8] = userSymbol;
-             allCells[8].innerHTML = userSymbol;
-        }
-
-        endGame('You Win! I knew you loved me! ❤️');
-        return;
-
+        // 1. Place the Heart in the center
+        placeSymbol(clickedCell, clickedCellIndex, userSymbol); 
+        
+        // 2. Auto-fill the two required hearts (0 and 8) to complete the visual win
+        const allCells = tttGrid.querySelectorAll('.cell');
+        setTimeout(() => { // Small delay for visual effect
+             if (gameState[0] === '') {
+                gameState[0] = userSymbol;
+                allCells[0].innerHTML = userSymbol;
+             }
+             if (gameState[8] === '') {
+                 gameState[8] = userSymbol;
+                 allCells[8].innerHTML = userSymbol;
+             }
+             endGame('You Win! I knew you loved me! ❤️', true);
+        }, 500);
+        
     } else {
-        // For any other click, show a message that they need to find the right move (to guide them to the center)
-        gameMessage.textContent = 'Keep trying! You need the perfect move to prove your love! 😉';
-        // Clear the move so they can try again.
-        gameState[clickedCellIndex] = '';
-        clickedCell.innerHTML = '';
-        return;
+        // User clicked the wrong spot: Playful response, clear move, and hint
+        gameMessage.innerHTML = 'Hmm, not quite! You need to find the **heart** of the matter... 😉';
+        
+        // Temporarily place the symbol and then clear it
+        placeSymbol(clickedCell, clickedCellIndex, userSymbol);
+        setTimeout(() => {
+            gameState[clickedCellIndex] = '';
+            clickedCell.innerHTML = '';
+            gameMessage.innerHTML = 'Win to prove that you love me!'; // Reset message
+        }, 1000); // Clear after 1 second
     }
 }
 
@@ -178,30 +174,21 @@ function placeSymbol(cell, index, symbol) {
     cell.innerHTML = symbol;
 }
 
-function checkWin() {
-    // We only check for the single, guaranteed winning combo [0, 4, 8] for the user symbol.
-    return (gameState[0] === userSymbol && gameState[4] === userSymbol && gameState[8] === userSymbol);
-}
-
-function endGame(message) {
+function endGame(message, didWin) {
     gameMessage.textContent = message;
     
-    // Disable further clicks
     tttGrid.querySelectorAll('.cell').forEach(cell => {
         cell.removeEventListener('click', handleCellClick);
         cell.style.cursor = 'default';
     });
 
-    // Proceed to the letter after a short delay
-    if (message.includes('Win')) {
+    if (didWin) {
         setTimeout(showLoveLetter, 2000);
     }
 }
 
-
 function showGame() {
     createGameGrid();
-    gameSection.style.display = 'block';
     gameMessage.textContent = 'You are the Heart. Click to make your first move!';
 }
 
@@ -209,17 +196,24 @@ function showGame() {
 // --- 6. Love Letter Logic ---
 
 function showLoveLetter() {
-    gameSection.style.display = 'none';
+    switchSection(gameSection, letterContainer);
     letterPrompt.style.display = 'block';
     loveLetterSection.style.display = 'block';
 }
 
 loveLetterSection.addEventListener('click', () => {
+    if (envelope.classList.contains('open')) return;
+    
     envelope.classList.add('open');
-    // Wait for the envelope animation to finish
+    letterPrompt.textContent = "Enjoy reading! I love you! 🥰";
+    
     setTimeout(() => {
+        // 3D flip effect: show content after the envelope has flipped
         letterContent.style.display = 'block';
-        letterPrompt.textContent = "Enjoy reading! I love you! 🥰";
-        loveLetterSection.style.cursor = 'default'; // Disable further clicks
-    }, 1000); 
+        letterContent.style.opacity = '0';
+        setTimeout(() => {
+             letterContent.style.transition = 'opacity 1s';
+             letterContent.style.opacity = '1';
+        }, 100);
+    }, 500); // Halfway through the 1s envelope flip animation
 });
