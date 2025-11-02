@@ -19,7 +19,12 @@
             --secondary-pink: #ffafcc;
             --background-color: #ffe8ee;
             --text-color: #333;
-            --animation-speed: 0.5s;
+            --animation-speed: 0.4s; /* Slightly faster transitions */
+        }
+
+        /* Essential for full viewport coverage */
+        html, body {
+            height: 100%;
         }
 
         body {
@@ -28,25 +33,27 @@
             background-color: var(--background-color);
             color: var(--text-color);
             overflow: hidden; 
+            /* Ensure the body is the full size of the viewport */
             min-height: 100vh;
         }
 
-        /* --- CONTENT & Z-INDEX FIX --- */
+        /* --- CONTENT & CENTERING FIX --- */
         #content {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            min-height: 100vh; /* Ensure full viewport height for perfect centering */
             padding: 20px;
             text-align: center;
             position: relative;
             z-index: 100; /* Ensure content is on top of hearts */
         }
 
-        /* --- SECTION STYLING & ANIMATIONS --- */
+        /* --- SECTION STYLING (FIXED OVERLAP) --- */
         .section {
-            background: rgba(255, 255, 255, 0.95);
+            /* FIX: Changed to fully opaque white to block background animations */
+            background: white; 
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -65,7 +72,7 @@
         }
 
         h1, h2 {
-            font-family: 'Pacifico', cursive; /* Use Pacifico for titles */
+            font-family: 'Pacifico', cursive;
             color: var(--primary-red);
             text-shadow: 2px 2px 4px rgba(255, 56, 92, 0.2);
         }
@@ -73,7 +80,7 @@
         #animated-text {
             min-height: 100px;
             display: block;
-            font-size: clamp(1.5em, 5vw, 2.8em); /* Responsive font size */
+            font-size: clamp(1.5em, 5vw, 2.8em);
             font-weight: 700;
         }
         
@@ -98,14 +105,14 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* --- FLOATING HEART ANIMATION (FULL SCREEN) --- */
+        /* --- FLOATING HEART ANIMATION (FIXED FULL SCREEN) --- */
         .heart {
-            position: absolute;
+            position: fixed; /* Use fixed to ensure they cover the viewport reliably */
             color: var(--primary-red);
             animation: float 15s linear infinite, wobble 5s ease-in-out infinite alternate;
             opacity: 0.7;
             pointer-events: none;
-            z-index: 1; /* Keep below content */
+            z-index: 1; 
         }
         
         @keyframes float {
@@ -118,7 +125,7 @@
             to { transform: translateX(10px) rotate(-5deg); }
         }
 
-        /* --- TIC-TAC-TOE STYLING (3D & ANIMATED) --- */
+        /* --- TIC-TAC-TOE STYLING --- */
         #game-section {
             display: flex;
             flex-direction: column;
@@ -132,11 +139,10 @@
             gap: 10px;
             margin-top: 20px;
             perspective: 1000px; 
-            transform: rotateX(15deg) rotateY(0deg); /* 3D tilt for the board */
+            transform: rotateX(15deg) rotateY(0deg); 
             transition: all 1s ease-in-out;
         }
         
-        /* Responsive Grid for Mobile */
         @media (max-width: 600px) {
             #tictactoe-grid {
                 grid-template-columns: repeat(3, 80px);
@@ -162,26 +168,7 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
         
-        .cell:hover:not(:empty) {
-            transform: translateZ(10px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Symbols */
-        .cell i {
-            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Heart Fly Animation (on click of pre-filled hearts) */
-        .cell.flying {
-            animation: flyUp 0.5s ease-out;
-            opacity: 0.5;
-        }
+        .cell.flying { animation: flyUp 0.5s ease-out; opacity: 0.5; }
 
         @keyframes flyUp {
             0% { transform: translateY(0) scale(1); opacity: 1; }
@@ -189,9 +176,8 @@
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        /* Winning animation (pulsing heart) */
         .winning-heart {
-            position: fixed; /* Fixed position over the screen */
+            position: fixed; 
             font-size: 5em;
             color: var(--primary-red);
             opacity: 0;
@@ -205,12 +191,12 @@
             100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
         }
 
-        /* --- ENVELOPE STYLING (FIXED AND CENTERED) --- */
+        /* --- ENVELOPE STYLING --- */
         #love-letter-container {
             position: relative;
             width: 380px;
             height: 280px;
-            margin: 50px auto 0; 
+            margin: 50px auto 0;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -225,7 +211,6 @@
             transition: transform 1s;
         }
 
-        /* Base Envelope Body */
         .envelope {
             position: absolute;
             width: 100%;
@@ -238,7 +223,6 @@
             transition: all 1s;
         }
 
-        /* Flaps using pseudo-elements */
         .envelope::before, .envelope::after {
             content: '';
             position: absolute;
@@ -246,16 +230,14 @@
             border-style: solid;
         }
         
-        /* Bottom V-flap (decorative) */
         .envelope::before {
             border-width: 0 190px 140px;
-            border-color: transparent transparent #cc2c4b; /* Darker red */
+            border-color: transparent transparent #cc2c4b;
             bottom: 0;
             left: 0;
             border-radius: 0 0 15px 15px;
         }
 
-        /* Top Closing Flap */
         .envelope::after {
             border-width: 140px 190px 0;
             border-color: var(--secondary-pink) transparent transparent;
@@ -267,13 +249,11 @@
             border-radius: 15px 15px 0 0;
         }
         
-        /* Open Animation */
         .envelope.open::after {
             transform: rotateX(180deg) translateY(-20px);
-            opacity: 0; /* Hide flap once flipped */
+            opacity: 0;
         }
         
-        /* The letter itself */
         .letter-content {
             position: absolute;
             top: 50%;
@@ -316,8 +296,6 @@
     </style>
 </head>
 <body>
-
-    <!-- This is where hearts will be generated by JavaScript -->
 
     <div id="content">
         <!-- 1. Animated Message Section -->
@@ -390,13 +368,13 @@
         'cross', '', 'cross',
         'cross', 'cross', 'heart'
     ];
-    const userSymbol = '<i class="fas fa-heart"></i>'; // Heart
-    const computerSymbol = '<i class="fas fa-times"></i>'; // Cross
-    const winIndex = 4; // Center cell is the winning move.
+    const userSymbol = '<i class="fas fa-heart"></i>';
+    const computerSymbol = '<i class="fas fa-times"></i>';
+    const winIndex = 4;
 
     let isGameActive = true;
 
-    // --- 2. Floating Hearts Animation ---
+    // --- 2. Floating Hearts Animation (Increased Frequency) ---
     function createHeart() {
         const heart = document.createElement('div');
         heart.classList.add('heart');
@@ -409,13 +387,14 @@
         heart.style.animationDelay = Math.random() * -10 + 's'; 
         heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
         
-        contentDiv.appendChild(heart);
+        document.body.appendChild(heart); // Append to body for fixed positioning
 
         setTimeout(() => {
             heart.remove();
         }, 18000); 
     }
-    setInterval(createHeart, 150); 
+    // FIX: Reduced interval for denser, full-screen animation effect
+    setInterval(createHeart, 100); 
 
     // --- Helper for smooth section transitions ---
     function switchSection(hideElement, showElement, callback = () => {}) {
@@ -424,18 +403,18 @@
             
             setTimeout(() => {
                 hideElement.style.display = 'none';
-            }, 500);
+            }, 400); // Matches the new CSS transition time
         }
         
         showElement.style.display = 'flex'; 
         setTimeout(() => {
             showElement.classList.add('active');
             callback();
-        }, hideElement ? 500 : 50); 
+        }, hideElement ? 400 : 50); 
     }
 
 
-    // --- 3. Animated Text Sequence (Faster Start) ---
+    // --- 3. Animated Text Sequence (FIX: Increased Speed) ---
 
     const messages = [
         "Happy Birthday, My Love!",
@@ -444,7 +423,8 @@
     ];
     let messageIndex = 0;
     let charIndex = 0;
-    const speed = 60; // Typing speed in ms
+    // FIX: Typing speed reduced to make the text appear much faster
+    const speed = 35; 
 
     function typeWriter() {
         if (messageIndex < messages.length) {
@@ -461,10 +441,9 @@
                     if (messageIndex < messages.length) {
                         typeWriter();
                     } else {
-                        // Sequence complete, show question
                         setTimeout(() => switchSection(introMessage, questionSection), 500); 
                     }
-                }, 1000);
+                }, 800); 
             }
         }
     }
@@ -488,7 +467,7 @@
     });
 
 
-    // --- 5. Tic-Tac-Toe Game Logic (Guaranteed Win via Center) ---
+    // --- 5. Tic-Tac-Toe Game Logic ---
 
     function createGameGrid() {
         tttGrid.innerHTML = '';
@@ -524,7 +503,7 @@
                 endGame('You Win! I knew you loved me! ❤️', true);
             }
         } else if (gameState[clickedCellIndex] === 'heart') {
-            // --- PRE-FILLED HEART CLICK (ANIMATION ONLY) ---
+            // --- PRE-FILLED HEART CLICK (FLY ANIMATION) ---
             clickedCell.classList.add('flying');
             gameMessage.textContent = 'Those hearts are already safe! Find the missing one.';
             
@@ -564,7 +543,7 @@
             const allCells = tttGrid.querySelectorAll('.cell');
             
             setTimeout(() => {
-                // Clear all crosses and cells except the winning hearts
+                // Clear all crosses and non-winning cells 
                 allCells.forEach((cell, index) => {
                     if (index !== 0 && index !== 4 && index !== 8) {
                         cell.style.transition = 'opacity 0.5s, transform 0.5s';
@@ -573,23 +552,19 @@
                     }
                 });
 
-                // Clear board structure
+                // Fade out board structure
                 tttGrid.style.opacity = '0';
                 tttGrid.style.transform = 'translateY(-50px) rotateX(15deg)';
                 gameMessage.innerHTML = '<span style="color: var(--primary-red); font-size: 2em;">You have my heart forever! ❤️</span>';
                 
-                // Start pulsing animation on the three winning hearts (0, 4, 8)
-                [0, 4, 8].forEach(index => {
-                    const heartPulse = document.createElement('div');
-                    heartPulse.classList.add('winning-heart');
-                    heartPulse.innerHTML = userSymbol;
-                    
-                    // Center the heart pulse in the screen
-                    heartPulse.style.top = '50%';
-                    heartPulse.style.left = '50%';
-                    
-                    document.body.appendChild(heartPulse);
-                });
+                // Start pulsing animation over the center of the screen
+                const heartPulse = document.createElement('div');
+                heartPulse.classList.add('winning-heart');
+                heartPulse.innerHTML = userSymbol;
+                heartPulse.style.top = '50%';
+                heartPulse.style.left = '50%';
+                document.body.appendChild(heartPulse);
+
 
                 // Proceed to the letter after a short delay
                 setTimeout(showLoveLetter, 4000);
