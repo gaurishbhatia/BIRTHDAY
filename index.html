@@ -3,608 +3,619 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday, My Love! ❤️</title>
-    <!-- Google Fonts: Pacifico (Playful/Romantic) and Caveat (Handwritten Letter) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Pacifico&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome (for the heart/cross symbols) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <title>Happy Birthday My Love ❤️</title>
     <style>
-        /* --- CSS VARIABLES & GLOBALS --- */
-        :root {
-            --primary-red: #ff385c;
-            --secondary-pink: #ffafcc;
-            --background-color: #ffe8ee;
-            --text-color: #333;
-            --animation-speed: 0.4s; /* Slightly faster transitions */
-        }
-
-        /* Essential for full viewport coverage */
-        html, body {
-            height: 100%;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            overflow: hidden; 
-            /* Ensure the body is the full size of the viewport */
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffc3e1 50%, #ff6b9d 100%);
             min-height: 100vh;
         }
 
-        /* --- CONTENT & CENTERING FIX --- */
-        #content {
+        /* Floating hearts and stars background */
+        .floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .float-item {
+            position: absolute;
+            animation: float-up 15s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Screen container */
+        .screen {
+            position: relative;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh; /* Ensure full viewport height for perfect centering */
             padding: 20px;
-            text-align: center;
-            position: relative;
-            z-index: 100; /* Ensure content is on top of hearts */
-        }
-
-        /* --- SECTION STYLING (FIXED OVERLAP) --- */
-        .section {
-            /* FIX: Changed to fully opaque white to block background animations */
-            background: white; 
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            max-width: 90%;
-            width: 550px;
-            display: none;
             opacity: 0;
-            transform: scale(0.9);
-            transition: opacity var(--animation-speed) ease-in-out, 
-                        transform var(--animation-speed) ease-in-out;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1;
         }
 
-        .section.active {
+        .screen.active {
             opacity: 1;
             transform: scale(1);
         }
 
-        h1, h2 {
-            font-family: 'Pacifico', cursive;
-            color: var(--primary-red);
-            text-shadow: 2px 2px 4px rgba(255, 56, 92, 0.2);
+        .screen.exit {
+            opacity: 0;
+            transform: scale(0.8);
         }
 
-        #animated-text {
-            min-height: 100px;
-            display: block;
-            font-size: clamp(1.5em, 5vw, 2.8em);
-            font-weight: 700;
-        }
-        
-        /* --- BUTTON STYLING --- */
-        button {
-            background-color: var(--secondary-pink);
+        /* Welcome messages */
+        .message-container {
+            text-align: center;
             color: white;
-            border: none;
-            padding: 12px 25px;
-            margin: 8px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        button:hover {
-            background-color: var(--primary-red);
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        .message {
+            font-size: 3em;
+            margin: 20px 0;
+            animation: slideIn 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(50px);
         }
 
-        /* --- FLOATING HEART ANIMATION (FIXED FULL SCREEN) --- */
-        .heart {
-            position: fixed; /* Use fixed to ensure they cover the viewport reliably */
-            color: var(--primary-red);
-            animation: float 15s linear infinite, wobble 5s ease-in-out infinite alternate;
-            opacity: 0.7;
-            pointer-events: none;
-            z-index: 1; 
-        }
-        
-        @keyframes float {
-            0% { transform: translate3d(0, 100vh, 0) rotate(0deg) scale(0.5); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translate3d(0, -10vh, 0) rotate(360deg) scale(1.5); opacity: 0; }
-        }
-        @keyframes wobble {
-            from { transform: translateX(-10px) rotate(5deg); }
-            to { transform: translateX(10px) rotate(-5deg); }
-        }
-
-        /* --- TIC-TAC-TOE STYLING --- */
-        #game-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #tictactoe-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 110px);
-            grid-template-rows: repeat(3, 110px);
-            gap: 10px;
-            margin-top: 20px;
-            perspective: 1000px; 
-            transform: rotateX(15deg) rotateY(0deg); 
-            transition: all 1s ease-in-out;
-        }
-        
-        @media (max-width: 600px) {
-            #tictactoe-grid {
-                grid-template-columns: repeat(3, 80px);
-                grid-template-rows: repeat(3, 80px);
-                gap: 5px;
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        .cell {
-            background-color: var(--secondary-pink);
-            border: 3px solid var(--primary-red);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 4.5em;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.3s;
-            color: var(--primary-red);
-            position: relative;
+        .message:nth-child(1) { animation-delay: 0.5s; }
+        .message:nth-child(2) { animation-delay: 1.5s; }
+        .message:nth-child(3) { animation-delay: 2.5s; }
+
+        /* Question screen */
+        .question-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
             transform-style: preserve-3d;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        
-        .cell.flying { animation: flyUp 0.5s ease-out; opacity: 0.5; }
+
+        .question-box h2 {
+            color: #ff1744;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-weight: bold;
+            transform: translateZ(20px);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff1744, #ff6b9d);
+            color: white;
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #ffc3e1, #ff8fab);
+            color: #ff1744;
+        }
+
+        .btn:hover {
+            transform: translateZ(30px) scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .playful-message {
+            color: #ff1744;
+            font-size: 2em;
+            margin-top: 30px;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Tic Tac Toe Game */
+        .game-container {
+            text-align: center;
+        }
+
+        .game-title {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            grid-template-rows: repeat(3, 150px);
+            gap: 15px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .cell {
+            background: linear-gradient(135deg, #fff 0%, #ffe0ee 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .cell:hover {
+            transform: translateZ(10px);
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+        }
+
+        .cell-content {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .heart-icon {
+            color: #ff1744;
+            filter: drop-shadow(3px 3px 6px rgba(255, 23, 68, 0.4));
+        }
+
+        .cross-icon {
+            color: #666;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .cell.fly-animation .heart-icon {
+            animation: flyUp 0.6s ease-out;
+        }
 
         @keyframes flyUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            50% { transform: translateY(-30px) scale(1.2); opacity: 0.8; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-80px) scale(1.3) rotateZ(15deg); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .winning-line {
+            position: absolute;
+            pointer-events: none;
         }
 
         .winning-heart {
-            position: fixed; 
-            font-size: 5em;
-            color: var(--primary-red);
-            opacity: 0;
-            animation: heartPulse 2s ease-out infinite;
-            z-index: 1000;
-        }
-        
-        @keyframes heartPulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(2.5); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+            position: absolute;
+            font-size: 4em;
+            color: #ff1744;
+            animation: expandPulse 1s ease-out forwards;
+            filter: drop-shadow(0 0 20px rgba(255, 23, 68, 0.8));
         }
 
-        /* --- ENVELOPE STYLING --- */
-        #love-letter-container {
-            position: relative;
-            width: 380px;
-            height: 280px;
-            margin: 50px auto 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
+        @keyframes expandPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
         }
-        
-        #love-letter-section {
-            position: relative;
-            width: 100%;
-            height: 100%;
+
+        .win-message {
+            color: white;
+            font-size: 3em;
+            margin-top: 40px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            animation: fadeInScale 1s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Envelope and Letter */
+        .envelope-container {
+            perspective: 1500px;
             cursor: pointer;
-            transform-style: preserve-3d;
-            transition: transform 1s;
         }
 
         .envelope {
-            position: absolute;
+            width: 400px;
+            height: 280px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.8s ease;
+        }
+
+        .envelope-body {
             width: 100%;
             height: 100%;
-            background-color: var(--primary-red);
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            z-index: 20;
-            transform-style: preserve-3d;
-            transition: all 1s;
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        .envelope::before, .envelope::after {
-            content: '';
+        .envelope-flap {
             position: absolute;
-            display: block;
-            border-style: solid;
-        }
-        
-        .envelope::before {
-            border-width: 0 190px 140px;
-            border-color: transparent transparent #cc2c4b;
-            bottom: 0;
-            left: 0;
-            border-radius: 0 0 15px 15px;
-        }
-
-        .envelope::after {
-            border-width: 140px 190px 0;
-            border-color: var(--secondary-pink) transparent transparent;
             top: 0;
             left: 0;
-            z-index: 25;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #ff1744, #ff6b9d);
             transform-origin: top;
-            transition: transform 1s ease-in-out, opacity 0.5s;
-            border-radius: 15px 15px 0 0;
-        }
-        
-        .envelope.open::after {
-            transform: rotateX(180deg) translateY(-20px);
-            opacity: 0;
-        }
-        
-        .letter-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateZ(-10px); 
-            width: 95%;
-            height: 95%;
-            z-index: 15;
-            background-color: white;
-            padding: 25px;
-            box-sizing: border-box;
-            font-family: 'Caveat', cursive; 
-            font-size: clamp(1em, 2vw, 1.2em);
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            transition: opacity 1s;
+            transition: all 0.8s ease;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            z-index: 2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        /* Ruled paper effect */
-        .letter-content.ruled {
-            background-image: repeating-linear-gradient(
-                to bottom,
-                #f0f0f0 0px, 
-                #f0f0f0 1px,
-                transparent 1px,
-                transparent 30px
-            );
-            background-size: 100% 31px;
-            border-left: 5px solid var(--primary-red);
-            padding-left: 35px;
+        .envelope.open .envelope-flap {
+            transform: rotateX(-180deg);
         }
-        .letter-content p {
-            margin: 0;
-            padding: 0;
-            line-height: 30px;
+
+        .letter {
+            position: absolute;
+            width: 90%;
+            height: 450px;
+            background: 
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 31px,
+                    #e8b4d0 31px,
+                    #e8b4d0 32px
+                ),
+                linear-gradient(to bottom, #fff9e6 0%, #fff5e1 100%);
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 5px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.8s ease;
+            z-index: 1;
+            overflow-y: auto;
+            border-left: 3px solid #ff6b9d;
+        }
+
+        .envelope:not(.open) .letter {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-120%);
+            opacity: 1;
+        }
+
+        .letter-content {
+            color: #333;
+            font-size: 1.2em;
+            line-height: 32px;
+            font-family: 'Brush Script MT', cursive;
             text-align: left;
-            min-height: 30px;
+        }
+
+        .letter-content p {
+            margin-bottom: 20px;
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 40px;
+            font-style: italic;
+            color: #ff1744;
+            font-size: 1.3em;
+        }
+
+        .envelope-hint {
+            color: white;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.3em;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .message { font-size: 2em; }
+            .board {
+                grid-template-columns: repeat(3, 100px);
+                grid-template-rows: repeat(3, 100px);
+                gap: 10px;
+            }
+            .cell { font-size: 3em; }
+            .envelope { width: 300px; height: 200px; }
+            .letter { height: 350px; }
         }
     </style>
 </head>
 <body>
+    <!-- Floating background -->
+    <div class="floating-bg" id="floatingBg"></div>
 
-    <div id="content">
-        <!-- 1. Animated Message Section -->
-        <div id="intro-message" class="section active">
-            <h1 id="animated-text"></h1>
+    <!-- Screen 1: Welcome Messages -->
+    <div class="screen active" id="screen1">
+        <div class="message-container">
+            <div class="message">Happy Birthday My Love! 💕</div>
+            <div class="message">Today is your special day! 🎉</div>
+            <div class="message">I made something special for you... ✨</div>
         </div>
+    </div>
 
-        <!-- 2. Question Section -->
-        <div id="question-section" class="section">
-            <h2>Ready for the Birthday Fun?</h2>
-            <button id="yes-btn">YES! I'm excited! 🎉</button>
-            <button id="no-btn">No, maybe later... 😴</button>
-        </div>
-
-        <!-- 3. Tic-Tac-Toe Game Section -->
-        <div id="game-section" class="section">
-            <h2>**Win to prove that you love me!**</h2>
-            <p style="color: #666; font-weight: 600;">(HINT: The heart always finds its center!)</p>
-            <div id="tictactoe-grid">
-                <!-- Cells generated by JavaScript will contain pre-filled hearts and crosses -->
+    <!-- Screen 2: Question -->
+    <div class="screen" id="screen2">
+        <div class="question-box">
+            <h2>Do you wanna see it? 💝</h2>
+            <div class="btn-container">
+                <button class="btn btn-yes" onclick="handleYes()">Yes! 😊</button>
+                <button class="btn btn-no" onclick="handleNo()">No 😅</button>
             </div>
-            <p id="game-message" style="margin-top: 25px; font-weight: bold;"></p>
-        </div>
-
-        <!-- 4. Love Letter Section (Container for centering) -->
-        <div id="love-letter-container" class="section">
-            <h2 id="letter-prompt" style="display: none; font-size: 1.8em;">Tap the magical envelope to open your letter!</h2>
-            <div id="love-letter-section">
-                <div class="envelope"></div>
-                <div class="letter-content ruled" id="the-letter" style="opacity: 0;">
-                    <!-- 💖💖💖 EDIT YOUR LETTER HERE 💖💖💖 -->
-                    <p>My Precious [Girlfriend's Name],</p>
-                    <p></p>
-                    <p>Happy Birthday! I hope this surprise brightened your day even a little bit. You deserve the world.</p>
-                    <p></p>
-                    <p>Of course you won the game! The heart always knows where it belongs—right in the center. And my heart is yours, today and every day.</p>
-                    <p></p>
-                    <p>Thank you for filling my life with so much joy, laughter, and unbelievable love. You are my best friend, my greatest adventure, and my beautiful future.</p>
-                    <p></p>
-                    <p>Here's to celebrating you!</p>
-                    <p></p>
-                    <p>I love you more than words can say.</p>
-                    <p></p>
-                    <p>Yours always and forever,</p>
-                    <p>Your [Your Nickname]</p>
-                    <!-- 💖💖💖 END OF EDIT AREA 💖💖💖 -->
-                </div>
+            <div class="playful-message" id="playfulMsg" style="display: none;">
+                Haha! I'm showing it anyway! 💕
             </div>
         </div>
     </div>
 
-<script>
-    // --- 1. Setup and Initialization ---
+    <!-- Screen 3: Tic Tac Toe -->
+    <div class="screen" id="screen3">
+        <div class="game-container">
+            <h2 class="game-title">Win to prove that you love me! 💖</h2>
+            <div class="board" id="board"></div>
+            <div class="win-message" id="winMessage" style="display: none;">
+                You have my heart forever! ❤️
+            </div>
+        </div>
+    </div>
 
-    const contentDiv = document.getElementById('content');
-    const introMessage = document.getElementById('intro-message');
-    const questionSection = document.getElementById('question-section');
-    const gameSection = document.getElementById('game-section');
-    const letterContainer = document.getElementById('love-letter-container');
-    const letterPrompt = document.getElementById('letter-prompt');
-    const loveLetterSection = document.getElementById('love-letter-section');
-    const envelope = document.querySelector('.envelope');
-    const letterContent = document.getElementById('the-letter');
-    const tttGrid = document.getElementById('tictactoe-grid');
-    const gameMessage = document.getElementById('game-message');
+    <!-- Screen 4: Love Letter -->
+    <div class="screen" id="screen4">
+        <div>
+            <div class="envelope-container" onclick="toggleEnvelope()">
+                <div class="envelope" id="envelope">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-body"></div>
+                    <div class="letter">
+                        <div class="letter-content">
+                            <p>My Dearest Love,</p>
+                            <p>Every moment with you feels like a beautiful dream. You light up my world in ways I never knew possible.</p>
+                            <p>Your smile is my favorite thing in this universe, and your laugh is the melody my heart dances to.</p>
+                            <p>On this special day, I want you to know that you mean everything to me. You're not just my girlfriend, you're my best friend, my partner, and my forever.</p>
+                            <p>Thank you for being the amazing person you are. Happy Birthday, my love!</p>
+                            <p class="signature">Forever yours,<br>Your Love ❤️</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="envelope-hint" id="envelopeHint">Tap the envelope to open! 💌</div>
+        </div>
+    </div>
 
-    // Pre-filled state: Only center (4) is empty. Diagonal is user heart.
-    let gameState = [
-        'heart', 'cross', 'cross',
-        'cross', '', 'cross',
-        'cross', 'cross', 'heart'
-    ];
-    const userSymbol = '<i class="fas fa-heart"></i>';
-    const computerSymbol = '<i class="fas fa-times"></i>';
-    const winIndex = 4;
-
-    let isGameActive = true;
-
-    // --- 2. Floating Hearts Animation (Increased Frequency) ---
-    function createHeart() {
-        const heart = document.createElement('div');
-        heart.classList.add('heart');
-        
-        const symbol = Math.random() < 0.9 ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-star"></i>';
-        heart.innerHTML = symbol; 
-        
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.animationDuration = Math.random() * 8 + 10 + 's'; 
-        heart.style.animationDelay = Math.random() * -10 + 's'; 
-        heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
-        
-        document.body.appendChild(heart); // Append to body for fixed positioning
-
-        setTimeout(() => {
-            heart.remove();
-        }, 18000); 
-    }
-    // FIX: Reduced interval for denser, full-screen animation effect
-    setInterval(createHeart, 100); 
-
-    // --- Helper for smooth section transitions ---
-    function switchSection(hideElement, showElement, callback = () => {}) {
-        if (hideElement) {
-            hideElement.classList.remove('active');
+    <script>
+        // Create floating hearts and stars
+        function createFloatingItems() {
+            const bg = document.getElementById('floatingBg');
+            const items = ['❤️', '💕', '💖', '⭐', '✨', '💝', '🌟'];
             
-            setTimeout(() => {
-                hideElement.style.display = 'none';
-            }, 400); // Matches the new CSS transition time
-        }
-        
-        showElement.style.display = 'flex'; 
-        setTimeout(() => {
-            showElement.classList.add('active');
-            callback();
-        }, hideElement ? 400 : 50); 
-    }
-
-
-    // --- 3. Animated Text Sequence (FIX: Increased Speed) ---
-
-    const messages = [
-        "Happy Birthday, My Love!",
-        "You are my whole heart...",
-        "Get ready for a little surprise!"
-    ];
-    let messageIndex = 0;
-    let charIndex = 0;
-    // FIX: Typing speed reduced to make the text appear much faster
-    const speed = 35; 
-
-    function typeWriter() {
-        if (messageIndex < messages.length) {
-            const currentMessage = messages[messageIndex];
-            if (charIndex < currentMessage.length) {
-                document.getElementById('animated-text').innerHTML += currentMessage.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeWriter, speed);
-            } else {
-                setTimeout(() => {
-                    document.getElementById('animated-text').innerHTML = '';
-                    charIndex = 0;
-                    messageIndex++;
-                    if (messageIndex < messages.length) {
-                        typeWriter();
-                    } else {
-                        setTimeout(() => switchSection(introMessage, questionSection), 500); 
-                    }
-                }, 800); 
-            }
-        }
-    }
-
-    window.onload = () => {
-        typeWriter();
-    };
-
-
-    // --- 4. Question Logic ---
-
-    document.getElementById('yes-btn').addEventListener('click', () => {
-        switchSection(questionSection, gameSection, showGame);
-    });
-
-    document.getElementById('no-btn').addEventListener('click', () => {
-        gameMessage.textContent = "Hahaha! Too bad, I'm going to show it to you anyway! 😉";
-        setTimeout(() => {
-             switchSection(questionSection, gameSection, showGame);
-        }, 1000);
-    });
-
-
-    // --- 5. Tic-Tac-Toe Game Logic ---
-
-    function createGameGrid() {
-        tttGrid.innerHTML = '';
-        
-        for (let i = 0; i < 9; i++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.setAttribute('data-index', i);
-            cell.addEventListener('click', handleCellClick);
-            
-            if (gameState[i] === 'heart') {
-                cell.innerHTML = userSymbol;
-            } else if (gameState[i] === 'cross') {
-                cell.innerHTML = computerSymbol;
-            }
-            
-            tttGrid.appendChild(cell);
-        }
-        isGameActive = true;
-    }
-
-    function handleCellClick(event) {
-        if (!isGameActive) return;
-
-        const clickedCell = event.target;
-        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-
-        if (clickedCellIndex === winIndex) {
-            // --- WINNING MOVE (CENTER) ---
-            if (gameState[winIndex] === '') {
-                gameState[winIndex] = 'heart';
-                placeSymbol(clickedCell, userSymbol);
-                endGame('You Win! I knew you loved me! ❤️', true);
-            }
-        } else if (gameState[clickedCellIndex] === 'heart') {
-            // --- PRE-FILLED HEART CLICK (FLY ANIMATION) ---
-            clickedCell.classList.add('flying');
-            gameMessage.textContent = 'Those hearts are already safe! Find the missing one.';
-            
-            setTimeout(() => {
-                clickedCell.classList.remove('flying');
-                gameMessage.textContent = 'Win to prove that you love me!';
-            }, 600);
-            
-        } else {
-            // --- WRONG MOVE (BLOCK AND HINT) ---
-            gameMessage.innerHTML = 'Nope! That spot is not the key to my heart... Try again! 😜';
-            
-            clickedCell.style.transform = 'scale(0.9) rotateZ(5deg)';
-            
-            setTimeout(() => {
-                clickedCell.style.transform = 'scale(1) rotateZ(0deg)';
-                gameMessage.textContent = 'Win to prove that you love me!';
+            setInterval(() => {
+                const item = document.createElement('div');
+                item.className = 'float-item';
+                item.textContent = items[Math.floor(Math.random() * items.length)];
+                item.style.left = Math.random() * 100 + '%';
+                item.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                item.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                item.style.animationDelay = '0s';
+                bg.appendChild(item);
+                
+                setTimeout(() => item.remove(), 15000);
             }, 500);
         }
-    }
 
-    function placeSymbol(cell, symbol) {
-        cell.innerHTML = symbol;
-    }
+        createFloatingItems();
 
-    function endGame(message, didWin) {
-        isGameActive = false;
-        gameMessage.textContent = message;
-        
-        tttGrid.querySelectorAll('.cell').forEach(cell => {
-            cell.removeEventListener('click', handleCellClick);
-            cell.style.cursor = 'default';
-        });
+        // Screen transitions
+        let currentScreen = 1;
 
-        if (didWin) {
-            // --- Winning Animation ---
-            const allCells = tttGrid.querySelectorAll('.cell');
+        function showScreen(screenNum) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+                s.classList.add('exit');
+            });
             
             setTimeout(() => {
-                // Clear all crosses and non-winning cells 
-                allCells.forEach((cell, index) => {
-                    if (index !== 0 && index !== 4 && index !== 8) {
-                        cell.style.transition = 'opacity 0.5s, transform 0.5s';
-                        cell.style.opacity = '0';
-                        cell.style.transform = 'translateY(100px)';
-                    }
-                });
-
-                // Fade out board structure
-                tttGrid.style.opacity = '0';
-                tttGrid.style.transform = 'translateY(-50px) rotateX(15deg)';
-                gameMessage.innerHTML = '<span style="color: var(--primary-red); font-size: 2em;">You have my heart forever! ❤️</span>';
-                
-                // Start pulsing animation over the center of the screen
-                const heartPulse = document.createElement('div');
-                heartPulse.classList.add('winning-heart');
-                heartPulse.innerHTML = userSymbol;
-                heartPulse.style.top = '50%';
-                heartPulse.style.left = '50%';
-                document.body.appendChild(heartPulse);
-
-
-                // Proceed to the letter after a short delay
-                setTimeout(showLoveLetter, 4000);
-            }, 1000);
+                document.getElementById(`screen${screenNum}`).classList.remove('exit');
+                document.getElementById(`screen${screenNum}`).classList.add('active');
+                currentScreen = screenNum;
+            }, 300);
         }
-    }
 
-    function showGame() {
-        createGameGrid();
-        gameMessage.textContent = 'You are the Heart. Click to make your first move!';
-        letterPrompt.style.display = 'none';
-    }
+        // Auto transition from screen 1 to 2
+        setTimeout(() => showScreen(2), 5000);
 
+        // Question handlers
+        function handleYes() {
+            setTimeout(() => showScreen(3), 500);
+            initGame();
+        }
 
-    // --- 6. Love Letter Logic ---
-
-    function showLoveLetter() {
-        document.querySelectorAll('.winning-heart').forEach(el => el.remove());
-        
-        switchSection(gameSection, letterContainer);
-        letterPrompt.style.display = 'block';
-        loveLetterSection.style.display = 'flex';
-        
-        envelope.classList.remove('open');
-        letterContent.style.opacity = '0';
-    }
-
-    loveLetterSection.addEventListener('click', () => {
-        if (envelope.classList.contains('open')) return;
-        
-        envelope.classList.add('open');
-        letterPrompt.textContent = "Enjoy reading! I love you! 🥰";
-        
-        setTimeout(() => {
-            letterContent.style.display = 'block';
+        function handleNo() {
+            const msg = document.getElementById('playfulMsg');
+            msg.style.display = 'block';
             setTimeout(() => {
-                 letterContent.style.opacity = '1';
-            }, 100);
-        }, 800); 
-    });
-</script>
+                showScreen(3);
+                initGame();
+            }, 2000);
+        }
+
+        // Tic Tac Toe Game
+        const board = [
+            ['X', '❤️', 'X'],
+            ['❤️', '', 'X'],
+            ['X', '❤️', 'X']
+        ];
+
+        function initGame() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+            
+            board.forEach((row, i) => {
+                row.forEach((cell, j) => {
+                    const cellEl = document.createElement('div');
+                    cellEl.className = 'cell';
+                    
+                    if (cell !== '') {
+                        cellEl.classList.add('disabled');
+                        const content = document.createElement('div');
+                        content.className = 'cell-content';
+                        content.innerHTML = cell === 'X' 
+                            ? '<span class="cross-icon">✕</span>' 
+                            : '<span class="heart-icon">❤️</span>';
+                        cellEl.appendChild(content);
+                        
+                        if (cell === '❤️') {
+                            cellEl.onclick = () => {
+                                cellEl.classList.add('fly-animation');
+                                setTimeout(() => cellEl.classList.remove('fly-animation'), 600);
+                            };
+                        }
+                    } else {
+                        cellEl.onclick = () => handleCellClick(i, j, cellEl);
+                    }
+                    
+                    boardEl.appendChild(cellEl);
+                });
+            });
+        }
+
+        function handleCellClick(i, j, cellEl) {
+            if (i === 1 && j === 1) {
+                cellEl.innerHTML = '<span class="heart-icon">❤️</span>';
+                cellEl.classList.add('disabled');
+                cellEl.onclick = null;
+                
+                setTimeout(() => {
+                    celebrateWin();
+                }, 500);
+            }
+        }
+
+        function celebrateWin() {
+            const boardEl = document.getElementById('board');
+            const cells = boardEl.querySelectorAll('.cell');
+            
+            // Create expanding pulse hearts
+            const positions = [
+                { top: '75px', left: '75px' },
+                { top: '225px', left: '225px' },
+                { top: '375px', left: '375px' }
+            ];
+            
+            positions.forEach((pos, index) => {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'winning-heart';
+                    heart.textContent = '❤️';
+                    heart.style.top = pos.top;
+                    heart.style.left = pos.left;
+                    boardEl.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 1000);
+                }, index * 200);
+            });
+            
+            setTimeout(() => {
+                cells.forEach(cell => {
+                    cell.style.opacity = '0';
+                    cell.style.transform = 'scale(0)';
+                });
+            }, 600);
+            
+            setTimeout(() => {
+                document.getElementById('winMessage').style.display = 'block';
+            }, 1200);
+            
+            setTimeout(() => {
+                showScreen(4);
+            }, 3500);
+        }
+
+        // Envelope
+        let envelopeOpen = false;
+
+        function toggleEnvelope() {
+            const envelope = document.getElementById('envelope');
+            const hint = document.getElementById('envelopeHint');
+            
+            if (!envelopeOpen) {
+                envelope.classList.add('open');
+                hint.style.display = 'none';
+                envelopeOpen = true;
+            }
+        }
+    </script>
 </body>
 </html>
