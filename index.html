@@ -201,6 +201,7 @@
             gap: 15px;
             perspective: 1000px;
             position: relative;
+            margin: 0 auto;
         }
 
         .cell {
@@ -285,19 +286,15 @@
 
         @keyframes riseAndExplode {
             0% { 
-                transform: translateY(0) scale(1); 
+                transform: scale(1); 
                 opacity: 1; 
             }
-            30% { 
-                transform: translateY(-80px) scale(2); 
-                opacity: 1; 
-            }
-            60% { 
-                transform: translateY(-150px) scale(4); 
-                opacity: 0.9; 
+            50% { 
+                transform: scale(10); 
+                opacity: 0.8; 
             }
             100% { 
-                transform: translateY(-250px) scale(8); 
+                transform: scale(20); 
                 opacity: 0; 
             }
         }
@@ -396,10 +393,10 @@
         }
 
         .letter-content {
-            color: #333;
-            font-size: 1.2em;
+            color: #2c2c2c;
+            font-size: 1.25em;
             line-height: 32px;
-            font-family: 'Brush Script MT', cursive;
+            font-family: 'Brush Script MT', 'Segoe Script', cursive;
             text-align: left;
         }
 
@@ -437,8 +434,8 @@
                 gap: 10px;
             }
             .cell { font-size: 3em; }
-            .envelope { width: 300px; height: 200px; }
-            .letter { height: 350px; }
+            .envelope { width: 350px; height: 250px; }
+            .letter { height: 400px; font-size: 1em; padding: 35px 25px; }
         }
     </style>
 </head>
